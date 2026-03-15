@@ -1,0 +1,97 @@
+@import "tailwindcss";
+
+@theme {
+  --color-navy-900: #0f1117;
+  --color-navy-800: #141b28;
+  --color-navy-700: #1a1f2e;
+  --color-navy-600: #2a3348;
+  --color-navy-500: #3d4656;
+  --color-navy-400: #4a5568;
+  --color-brand: #3b5bdb;
+  --color-brand-dark: #2f4ac0;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    font-family: "DM Sans", sans-serif;
+    background-color: var(--color-navy-900);
+    color: #e8ecf4;
+  }
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-navy-600);
+    border-radius: 2px;
+  }
+}
+
+@layer components {
+  .nav-item {
+    @apply flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer text-slate-400 hover:text-slate-200 hover:bg-navy-700 transition-all duration-150 text-sm;
+  }
+  .nav-item.active {
+    @apply bg-brand/10 text-brand border-r-2 border-brand rounded-r-none;
+  }
+  .metric-card {
+    @apply bg-navy-800 border border-navy-500 rounded-xl p-4 hover:border-brand/40 transition-colors duration-200 cursor-default;
+  }
+  .table-card {
+    @apply bg-navy-800 border border-navy-500 rounded-xl overflow-hidden;
+  }
+  .badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+  .badge-green {
+    @apply bg-green-500/10 text-green-400;
+  }
+  .badge-amber {
+    @apply bg-amber-500/10 text-amber-400;
+  }
+  .badge-red {
+    @apply bg-red-500/10 text-red-400;
+  }
+  .badge-blue {
+    @apply bg-brand/10 text-brand;
+  }
+  .badge-purple {
+    @apply bg-violet-500/10 text-violet-400;
+  }
+  .btn-primary {
+    @apply bg-brand hover:bg-brand-dark text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors duration-150 cursor-pointer border-none;
+  }
+  .btn-action {
+    @apply bg-navy-600 hover:bg-navy-500 border border-navy-400 text-slate-300 hover:text-slate-100 text-xs px-3 py-1.5 rounded-md transition-all duration-150 cursor-pointer mr-1;
+  }
+  .btn-danger {
+    @apply bg-navy-600 hover:bg-red-500/20 border border-navy-400 hover:border-red-500/40 text-slate-300 hover:text-red-400 text-xs px-3 py-1.5 rounded-md transition-all duration-150 cursor-pointer;
+  }
+  .form-input {
+    @apply bg-navy-700 border border-navy-500 rounded-lg px-3 py-2 text-slate-200 text-sm outline-none focus:border-brand transition-colors placeholder-slate-500 w-full;
+  }
+  .form-select {
+    @apply bg-navy-700 border border-navy-500 rounded-lg px-3 py-2 text-slate-200 text-sm outline-none focus:border-brand transition-colors cursor-pointer;
+  }
+  .section-card {
+    @apply bg-navy-800 border border-navy-500 rounded-xl p-5;
+  }
+  .page-title {
+    @apply text-lg font-semibold text-slate-100;
+  }
+  .page-sub {
+    @apply text-sm text-slate-400 mt-1 mb-5;
+  }
+  .chart-card {
+    @apply bg-navy-800 border border-navy-500 rounded-xl p-5;
+  }
+  .chart-title {
+    @apply text-sm font-medium text-slate-200 mb-4;
+  }
+}
