@@ -1,8 +1,21 @@
 import {
-  LayoutDashboard, Store, Users, BookOpen, Package,
-  DollarSign, Tag, Star, BarChart2, FileText,
-  Bell, Settings, ShieldCheck, ScrollText, LogOut,
-  ChevronLeft, ChevronRight
+  LayoutDashboard,
+  Store,
+  Users,
+  BookOpen,
+  Package,
+  DollarSign,
+  Tag,
+  Star,
+  BarChart2,
+  FileText,
+  Bell,
+  Settings,
+  ShieldCheck,
+  ScrollText,
+  LogOut,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 const navItems = [
@@ -26,7 +39,12 @@ const navItems = [
   { id: "logs", label: "System Logs", icon: ScrollText },
 ];
 
-export default function Sidebar({ currentPage, onNavigate, collapsed, onToggle }) {
+export default function Sidebar({
+  currentPage,
+  onNavigate,
+  collapsed,
+  onToggle,
+}) {
   return (
     <div
       className={`${
@@ -40,7 +58,9 @@ export default function Sidebar({ currentPage, onNavigate, collapsed, onToggle }
         </div>
         {!collapsed && (
           <div className="overflow-hidden">
-            <div className="text-slate-100 font-semibold text-sm leading-none">BookVault</div>
+            <div className="text-slate-100 font-semibold text-sm leading-none">
+              Spark Books
+            </div>
             <div className="text-slate-500 text-xs mt-0.5">Super Admin</div>
           </div>
         )}
@@ -52,7 +72,10 @@ export default function Sidebar({ currentPage, onNavigate, collapsed, onToggle }
           if (item.section) {
             if (collapsed) return null;
             return (
-              <div key={i} className="px-2 pt-4 pb-1 text-[10px] text-slate-500 font-medium tracking-widest uppercase">
+              <div
+                key={i}
+                className="px-2 pt-4 pb-1 text-[10px] text-slate-500 font-medium tracking-widest uppercase"
+              >
                 {item.section}
               </div>
             );

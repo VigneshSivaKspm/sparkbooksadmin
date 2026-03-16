@@ -100,9 +100,9 @@ export const categories = [
 ];
 
 export const admins = [
-  { name: "Super Admin", email: "admin@bookvault.com", role: "Super Admin", permissions: "Full Access" },
-  { name: "Maria Ortiz", email: "maria@bookvault.com", role: "Moderator", permissions: "Reviews, Users" },
-  { name: "Dev Kumar", email: "dev@bookvault.com", role: "Admin", permissions: "Books, Orders, Sellers" },
+  { name: "Super Admin", email: "admin@sparkbooks.com", role: "Super Admin", permissions: "Full Access" },
+  { name: "Maria Ortiz", email: "maria@sparkbooks.com", role: "Moderator", permissions: "Reviews, Users" },
+  { name: "Dev Kumar", email: "dev@sparkbooks.com", role: "Admin", permissions: "Books, Orders, Sellers" },
 ];
 
 export const logs = [

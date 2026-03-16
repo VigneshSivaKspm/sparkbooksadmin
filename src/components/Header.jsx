@@ -1,26 +1,45 @@
 import { Search, Bell, Settings, Sun, Moon } from "lucide-react";
 
 const pageLabels = {
-  dashboard: "Dashboard", analytics: "Analytics", reports: "Reports",
-  sellers: "Seller Management", users: "User Management", books: "Book Management",
-  orders: "Order Management", commission: "Commission", categories: "Categories",
-  reviews: "Reviews & Ratings", notifications: "Notifications",
-  settings: "Platform Settings", admins: "Admin Management", logs: "System Logs",
+  dashboard: "Dashboard",
+  analytics: "Analytics",
+  reports: "Reports",
+  sellers: "Seller Management",
+  users: "User Management",
+  books: "Book Management",
+  orders: "Order Management",
+  commission: "Commission",
+  categories: "Categories",
+  reviews: "Reviews & Ratings",
+  notifications: "Notifications",
+  settings: "Platform Settings",
+  admins: "Admin Management",
+  logs: "System Logs",
 };
 
-export default function Header({ currentPage, darkMode, onToggleDark, onNavigate }) {
+export default function Header({
+  currentPage,
+  darkMode,
+  onToggleDark,
+  onNavigate,
+}) {
   return (
     <div className="h-13 bg-navy-800 border-b border-navy-500 flex items-center gap-3 px-5 flex-shrink-0">
       {/* Breadcrumb */}
       <div className="flex items-center gap-1.5 text-xs text-slate-400">
-        <span>BookVault</span>
+        <span>Spark Books</span>
         <span className="text-slate-600">›</span>
-        <span className="text-slate-200 font-medium">{pageLabels[currentPage] || currentPage}</span>
+        <span className="text-slate-200 font-medium">
+          {pageLabels[currentPage] || currentPage}
+        </span>
       </div>
 
       {/* Search */}
       <div className="relative flex-1 max-w-xs ml-4">
-        <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+        <Search
+          size={13}
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
+        />
         <input
           type="text"
           placeholder="Search users, orders, books…"
