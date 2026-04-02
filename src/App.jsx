@@ -5,6 +5,7 @@ import { ToastProvider } from "./hooks/useToast";
 
 import DashboardPage from "./pages/DashboardPage";
 import SellersPage from "./pages/SellersPage";
+import SellerApprovalsPage from "./pages/SellerApprovalsPage";
 import UsersPage from "./pages/UsersPage";
 import BooksPage from "./pages/BooksPage";
 import OrdersPage from "./pages/OrdersPage";
@@ -21,6 +22,7 @@ import LogsPage from "./pages/LogsPage";
 const pages = {
   dashboard: DashboardPage,
   sellers: SellersPage,
+  sellerApprovals: SellerApprovalsPage,
   users: UsersPage,
   books: BooksPage,
   orders: OrdersPage,

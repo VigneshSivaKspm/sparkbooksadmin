@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import {
   BarChart,
   Bar,
@@ -17,13 +18,13 @@ import MetricCard from "../components/MetricCard";
 import Badge from "../components/Badge";
 import Avatar from "../components/Avatar";
 import {
-  metrics,
-  monthlyRevenue,
-  sellerGrowth,
-  revenueByCategory,
-  orderTrend,
-  orders,
-} from "../data/mockData";
+  generateMetrics,
+  generateMonthlyRevenue,
+  generateSellerGrowth,
+  generateRevenueByCategory,
+  generateOrderTrend,
+} from "../data/firestoreData";
+import { ordersService } from "../services/firestoreService";
 import { useToast } from "../hooks/useToast";
 
 const fmt = (v) => `$${(v / 1000).toFixed(0)}K`;
@@ -46,13 +47,73 @@ const CustomTooltip = ({ active, payload, label, prefix = "" }) => {
 
 export default function DashboardPage({ onNavigate }) {
   const toast = useToast();
+  const [metrics, setMetrics] = useState(null);
+  const [monthlyRevenue, setMonthlyRevenue] = useState([]);
+  const [sellerGrowth, setSellerGrowth] = useState([]);
+  const [revenueByCategory, setRevenueByCategory] = useState([]);
+  const [orderTrend, setOrderTrend] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [m, mr, sg, rc, ot, o] = await Promise.all([
+          generateMetrics(),
+          generateMonthlyRevenue(),
+          generateSellerGrowth(),
+          generateRevenueByCategory(),
+          generateOrderTrend(),
+          ordersService.getAll(),
+        ]);
+
+        setMetrics(m);
+        setMonthlyRevenue(mr);
+        setSellerGrowth(sg);
+        setRevenueByCategory(rc);
+        setOrderTrend(ot);
+        setOrders(o.slice(0, 5));
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+        toast("Error loading dashboard data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center">
+          <div className="text-2xl mb-2">Loading dashboard...</div>
+          <div className="text-slate-400">Fetching data from Firebase</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!metrics) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center">
+          <div className="text-2xl mb-2">No data available</div>
+          <div className="text-slate-400">
+            Configure Firebase or add some data
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
-      <div>
-        <div className="page-title">Good morning, Admin 👋</div>
-        <div className="page-sub">
-          Here's what's happening on Spark Books today — March 15, 2026
-        </div>
+      <div className="page-title">Good morning, Admin 👋</div>
+      <div className="page-sub">
+        Here's what's happening on Spark Books today — March 15, 2026
       </div>
 
       {/* Metric Cards */}

@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import {
   AreaChart,
   Area,
@@ -9,7 +10,12 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
-import { monthlyRevenue } from "../data/mockData";
+import {
+  generateMonthlyRevenue,
+  generateRevenueByCategory,
+} from "../data/firestoreData";
+import { booksService, sellersService } from "../services/firestoreService";
+import { useToast } from "../hooks/useToast";
 
 const userGrowth = [
   { month: "Apr", users: 28000 },
@@ -70,6 +76,77 @@ const kpis = [
 ];
 
 export default function AnalyticsPage() {
+  const toast = useToast();
+  const [monthlyRevenue, setMonthlyRevenue] = useState([]);
+  const [userGrowth, setUserGrowth] = useState([]);
+  const [genreSales, setGenreSales] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [mr, books] = await Promise.all([
+          generateMonthlyRevenue(),
+          booksService.getAll(),
+        ]);
+
+        setMonthlyRevenue(mr);
+
+        // Generate user growth data (simulated based on book count growth)
+        const months = [
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec",
+          "Jan",
+          "Feb",
+          "Mar",
+        ];
+        setUserGrowth(
+          months.map((month, idx) => ({
+            month,
+            users: Math.floor(20000 + idx * 2000),
+          })),
+        );
+
+        // Generate genre sales from books data
+        const genres = {};
+        books.forEach((b) => {
+          const cat = b.category || "Other";
+          genres[cat] = (genres[cat] || 0) + 1;
+        });
+
+        setGenreSales(
+          Object.entries(genres).map(([genre, count]) => ({
+            genre,
+            books: count,
+          })),
+        );
+      } catch (error) {
+        console.error("Error fetching analytics data:", error);
+        toast("Error loading analytics");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full text-slate-400">
+        Loading analytics...
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="page-title">Analytics</div>

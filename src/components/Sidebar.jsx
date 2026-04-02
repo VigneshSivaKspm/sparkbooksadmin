@@ -25,6 +25,7 @@ const navItems = [
   { id: "reports", label: "Reports", icon: FileText },
   { section: "MANAGEMENT" },
   { id: "sellers", label: "Seller Management", icon: Store, badge: 4 },
+  { id: "sellerApprovals", label: "Seller Approvals", icon: ShieldCheck },
   { id: "users", label: "User Management", icon: Users },
   { id: "books", label: "Book Management", icon: BookOpen },
   { id: "orders", label: "Order Management", icon: Package },

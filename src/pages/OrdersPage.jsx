@@ -1,17 +1,68 @@
+import { useState, useEffect } from "react";
 import Badge from "../components/Badge";
 import Avatar from "../components/Avatar";
-import { orders } from "../data/mockData";
+import { ordersService } from "../services/firestoreService";
 import { useToast } from "../hooks/useToast";
-
-const stats = [
-  { label: "Total Orders", value: "9,214", sub: "All time", color: "" },
-  { label: "Pending", value: "312", sub: "Awaiting action", color: "text-amber-400" },
-  { label: "Delivered", value: "8,482", sub: "Successfully fulfilled", color: "text-green-400" },
-  { label: "Cancelled", value: "420", sub: "Total refunded", color: "text-red-400" },
-];
 
 export default function OrdersPage() {
   const toast = useToast();
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        setLoading(true);
+        const data = await ordersService.getAll();
+        setOrders(data);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+        toast("Error loading orders");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, []);
+
+  const stats = [
+    {
+      label: "Total Orders",
+      value: orders.length.toLocaleString(),
+      sub: "All time",
+      color: "",
+    },
+    {
+      label: "Pending",
+      value: orders.filter(
+        (o) => o.status === "Processing" || o.status === "Pending",
+      ).length,
+      sub: "Awaiting action",
+      color: "text-amber-400",
+    },
+    {
+      label: "Delivered",
+      value: orders.filter((o) => o.status === "Delivered").length,
+      sub: "Successfully fulfilled",
+      color: "text-green-400",
+    },
+    {
+      label: "Cancelled",
+      value: orders.filter((o) => o.status === "Cancelled").length,
+      sub: "Total refunded",
+      color: "text-red-400",
+    },
+  ];
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full text-slate-400">
+        Loading orders...
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="page-title">Order Management</div>
@@ -20,8 +71,14 @@ export default function OrdersPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
         {stats.map((s) => (
           <div key={s.label} className="section-card">
-            <div className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-1">{s.label}</div>
-            <div className={`text-2xl font-semibold ${s.color || "text-slate-100"}`}>{s.value}</div>
+            <div className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-1">
+              {s.label}
+            </div>
+            <div
+              className={`text-2xl font-semibold ${s.color || "text-slate-100"}`}
+            >
+              {s.value}
+            </div>
             <div className="text-xs text-slate-500 mt-1">{s.sub}</div>
           </div>
         ))}
@@ -31,15 +88,35 @@ export default function OrdersPage() {
         <table className="w-full">
           <thead>
             <tr className="bg-navy-700">
-              {["Order ID", "Customer", "Seller", "Book", "Amount", "Payment", "Status", "Date", "Actions"].map((h) => (
-                <th key={h} className="px-4 py-2.5 text-left text-xs text-slate-400 font-medium uppercase tracking-wide whitespace-nowrap">{h}</th>
+              {[
+                "Order ID",
+                "Customer",
+                "Seller",
+                "Book",
+                "Amount",
+                "Payment",
+                "Status",
+                "Date",
+                "Actions",
+              ].map((h) => (
+                <th
+                  key={h}
+                  className="px-4 py-2.5 text-left text-xs text-slate-400 font-medium uppercase tracking-wide whitespace-nowrap"
+                >
+                  {h}
+                </th>
               ))}
             </tr>
           </thead>
           <tbody>
             {orders.map((o) => (
-              <tr key={o.id} className="border-t border-navy-500 hover:bg-navy-700/40 transition-colors">
-                <td className="px-4 py-3 font-mono text-xs text-slate-400">{o.id}</td>
+              <tr
+                key={o.id}
+                className="border-t border-navy-500 hover:bg-navy-700/40 transition-colors"
+              >
+                <td className="px-4 py-3 font-mono text-xs text-slate-400">
+                  {o.id}
+                </td>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
                     <Avatar name={o.customer} />
@@ -47,17 +124,41 @@ export default function OrdersPage() {
                   </div>
                 </td>
                 <td className="px-4 py-3 text-sm text-slate-300">{o.seller}</td>
-                <td className="px-4 py-3 text-sm text-slate-300 max-w-[160px] truncate">{o.book}</td>
-                <td className="px-4 py-3 text-sm text-slate-200">${o.amount.toFixed(2)}</td>
-                <td className="px-4 py-3"><Badge status={o.payment} /></td>
-                <td className="px-4 py-3"><Badge status={o.status} /></td>
+                <td className="px-4 py-3 text-sm text-slate-300 max-w-[160px] truncate">
+                  {o.book}
+                </td>
+                <td className="px-4 py-3 text-sm text-slate-200">
+                  ${o.amount.toFixed(2)}
+                </td>
+                <td className="px-4 py-3">
+                  <Badge status={o.payment} />
+                </td>
+                <td className="px-4 py-3">
+                  <Badge status={o.status} />
+                </td>
                 <td className="px-4 py-3 text-xs text-slate-400">{o.date}</td>
                 <td className="px-4 py-3 whitespace-nowrap">
-                  <button className="btn-action" onClick={() => toast(`Viewing ${o.id}`)}>View</button>
-                  {o.status === "Cancelled"
-                    ? <button className="btn-danger" onClick={() => toast(`Refund of $${o.amount} initiated`)}>Refund</button>
-                    : <button className="btn-action" onClick={() => toast("Order status updated")}>Update</button>
-                  }
+                  <button
+                    className="btn-action"
+                    onClick={() => toast(`Viewing ${o.id}`)}
+                  >
+                    View
+                  </button>
+                  {o.status === "Cancelled" ? (
+                    <button
+                      className="btn-danger"
+                      onClick={() => toast(`Refund of $${o.amount} initiated`)}
+                    >
+                      Refund
+                    </button>
+                  ) : (
+                    <button
+                      className="btn-action"
+                      onClick={() => toast("Order status updated")}
+                    >
+                      Update
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}

@@ -1,26 +1,57 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Badge from "../components/Badge";
 import Avatar from "../components/Avatar";
-import { sellers } from "../data/mockData";
+import { sellersService } from "../services/firestoreService";
 import { useToast } from "../hooks/useToast";
 
 export default function SellersPage() {
   const toast = useToast();
+  const [sellers, setSellers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState("All");
   const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    const fetchSellers = async () => {
+      try {
+        setLoading(true);
+        const data = await sellersService.getAll();
+        setSellers(data);
+      } catch (error) {
+        console.error("Error fetching sellers:", error);
+        toast("Error loading sellers");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSellers();
+  }, []);
 
   const tabs = ["All", "Active", "Pending", "Suspended"];
   const filtered = sellers.filter(
     (s) =>
       (tab === "All" || s.status === tab) &&
-      (s.name.toLowerCase().includes(search.toLowerCase()) ||
-        s.shop.toLowerCase().includes(search.toLowerCase()))
+      (s.name?.toLowerCase().includes(search.toLowerCase()) ||
+        s.shop?.toLowerCase().includes(search.toLowerCase())),
   );
+
+  const pendingCount = sellers.filter((s) => s.status === "Pending").length;
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full text-slate-400">
+        Loading sellers...
+      </div>
+    );
+  }
 
   return (
     <div>
       <div className="page-title">Seller Management</div>
-      <div className="page-sub">Review, approve, and manage marketplace sellers</div>
+      <div className="page-sub">
+        Review, approve, and manage marketplace sellers
+      </div>
 
       <div className="flex gap-0.5 border-b border-navy-500 mb-4">
         {tabs.map((t) => (
@@ -28,12 +59,16 @@ export default function SellersPage() {
             key={t}
             onClick={() => setTab(t)}
             className={`px-4 py-2 text-sm transition-colors -mb-px border-b-2 ${
-              tab === t ? "text-brand border-brand" : "text-slate-400 border-transparent hover:text-slate-200"
+              tab === t
+                ? "text-brand border-brand"
+                : "text-slate-400 border-transparent hover:text-slate-200"
             }`}
           >
             {t}
-            {t === "Pending" && (
-              <span className="ml-1.5 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">4</span>
+            {t === "Pending" && pendingCount > 0 && (
+              <span className="ml-1.5 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
+                {pendingCount}
+              </span>
             )}
           </button>
         ))}
@@ -52,7 +87,10 @@ export default function SellersPage() {
           <option>Pending</option>
           <option>Suspended</option>
         </select>
-        <button className="btn-primary ml-auto" onClick={() => toast("Exporting seller list…")}>
+        <button
+          className="btn-primary ml-auto"
+          onClick={() => toast("Exporting seller list…")}
+        >
           Export CSV
         </button>
       </div>
@@ -61,15 +99,35 @@ export default function SellersPage() {
         <table className="w-full">
           <thead>
             <tr className="bg-navy-700">
-              {["Seller ID", "Seller Name", "Shop Name", "Email", "Books", "Total Sales", "Commission", "Status", "Actions"].map((h) => (
-                <th key={h} className="px-4 py-2.5 text-left text-xs text-slate-400 font-medium uppercase tracking-wide whitespace-nowrap">{h}</th>
+              {[
+                "Seller ID",
+                "Seller Name",
+                "Shop Name",
+                "Email",
+                "Books",
+                "Total Sales",
+                "Commission",
+                "Status",
+                "Actions",
+              ].map((h) => (
+                <th
+                  key={h}
+                  className="px-4 py-2.5 text-left text-xs text-slate-400 font-medium uppercase tracking-wide whitespace-nowrap"
+                >
+                  {h}
+                </th>
               ))}
             </tr>
           </thead>
           <tbody>
             {filtered.map((s) => (
-              <tr key={s.id} className="border-t border-navy-500 hover:bg-navy-700/40 transition-colors">
-                <td className="px-4 py-3 font-mono text-xs text-slate-400">{s.id}</td>
+              <tr
+                key={s.id}
+                className="border-t border-navy-500 hover:bg-navy-700/40 transition-colors"
+              >
+                <td className="px-4 py-3 font-mono text-xs text-slate-400">
+                  {s.id}
+                </td>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
                     <Avatar name={s.name} />
@@ -78,21 +136,56 @@ export default function SellersPage() {
                 </td>
                 <td className="px-4 py-3 text-sm text-slate-300">{s.shop}</td>
                 <td className="px-4 py-3 text-xs text-slate-400">{s.email}</td>
-                <td className="px-4 py-3 text-sm text-slate-300">{s.books}</td>
-                <td className="px-4 py-3 text-sm text-slate-200">${s.sales.toLocaleString()}</td>
-                <td className="px-4 py-3 text-sm text-slate-200">${s.commission.toLocaleString()}</td>
-                <td className="px-4 py-3"><Badge status={s.status} /></td>
+                <td className="px-4 py-3 text-sm text-slate-300">
+                  {s.books || 0}
+                </td>
+                <td className="px-4 py-3 text-sm text-slate-200">
+                  ${(s.sales || 0).toLocaleString()}
+                </td>
+                <td className="px-4 py-3 text-sm text-slate-200">
+                  ${(s.commission || 0).toLocaleString()}
+                </td>
+                <td className="px-4 py-3">
+                  <Badge status={s.status} />
+                </td>
                 <td className="px-4 py-3 whitespace-nowrap">
                   {s.status === "Pending" ? (
                     <>
-                      <button className="btn-action text-green-400 hover:bg-green-500/20 hover:border-green-500/40 hover:text-green-300 mr-1" onClick={() => toast(`${s.name} approved! Welcome email sent.`)}>Approve</button>
-                      <button className="btn-danger" onClick={() => toast(`${s.name} rejected`)}>Reject</button>
+                      <button
+                        className="btn-action text-green-400 hover:bg-green-500/20 hover:border-green-500/40 hover:text-green-300 mr-1"
+                        onClick={() =>
+                          toast(`${s.name} approved! Welcome email sent.`)
+                        }
+                      >
+                        Approve
+                      </button>
+                      <button
+                        className="btn-danger"
+                        onClick={() => toast(`${s.name} rejected`)}
+                      >
+                        Reject
+                      </button>
                     </>
                   ) : (
                     <>
-                      <button className="btn-action" onClick={() => toast("Viewing seller profile…")}>Profile</button>
-                      <button className="btn-action" onClick={() => toast("Viewing products…")}>Products</button>
-                      <button className="btn-danger" onClick={() => toast(`${s.name} suspended`)}>Suspend</button>
+                      <button
+                        className="btn-action"
+                        onClick={() => toast("Viewing seller profile…")}
+                      >
+                        Profile
+                      </button>
+                      <button
+                        className="btn-action"
+                        onClick={() => toast("Viewing products…")}
+                      >
+                        Products
+                      </button>
+                      <button
+                        className="btn-danger"
+                        onClick={() => toast(`${s.name} suspended`)}
+                      >
+                        Suspend
+                      </button>
                     </>
                   )}
                 </td>

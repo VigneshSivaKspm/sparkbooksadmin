@@ -1,18 +1,26 @@
 {
-  "name": "spark-books",
+  "name": "spark-books-backend",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently \"node api/server.js\" \"vite\"",
+    "api": "node api/server.js",
+    "admin": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "init-firebase": "node scripts/initializeSampleData.js"
   },
   "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "firebase": "^12.0.0",
     "lucide-react": "^0.577.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
+    "react-firebase-hooks": "^5.1.1",
     "recharts": "^3.8.0"
   },
   "devDependencies": {
@@ -23,6 +31,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.0",
     "autoprefixer": "^10.4.27",
+    "concurrently": "^8.2.2",
     "eslint": "^9.39.4",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",
